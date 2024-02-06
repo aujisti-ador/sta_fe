@@ -6,8 +6,7 @@ import axios from 'axios';
 
 
 const axiosServices = axios.create({
-  // baseURL: process.env.REACT_APP_API_URL,
-  baseURL: "http://localhost:3001/api",
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3001/api',
   withCredentials: true, // Important for handling cookies
 });
 
@@ -17,10 +16,3 @@ axiosServices.interceptors.response.use(
 );
 
 export default axiosServices;
-
-
-// const axiosInstance = axios.create({
-//   // baseURL: process.env.REACT_APP_API_URL,
-//   baseURL: "http://localhost:3001/api",
-//   withCredentials: true, // Important for handling cookies
-// });

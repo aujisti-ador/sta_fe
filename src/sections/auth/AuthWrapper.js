@@ -10,7 +10,6 @@ import AuthCard from './AuthCard';
 
 // assets
 import AuthBackground from 'assets/images/auth/AuthBackground';
-
 // ==============================|| AUTHENTICATION - WRAPPER ||============================== //
 
 const AuthWrapper = ({ children }) => (

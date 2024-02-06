@@ -26,7 +26,7 @@ const reducers = combineReducers({
     },
     cartReducer
   ),
-  product: productReducer
+  product: productReducer,
 });
 
 export default reducers;

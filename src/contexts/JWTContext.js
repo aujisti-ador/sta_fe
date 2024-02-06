@@ -3,7 +3,7 @@ import { createContext, useEffect, useReducer } from 'react';
 
 // third-party
 import { Chance } from 'chance';
-import jwtDecode from 'jwt-decode';
+import Cookies from 'js-cookie';
 
 // reducer - state management
 import { LOGIN, LOGOUT } from 'store/reducers/actions';
@@ -11,8 +11,9 @@ import authReducer from 'store/reducers/auth';
 
 // project import
 import Loader from 'components/Loader';
-import axios from 'utils/axios';
-
+// import axios from 'axios';
+// import axios from 'utils/axios';
+import axios from 'utils/axiosdd';
 const chance = new Chance();
 
 // constant
@@ -22,16 +23,47 @@ const initialState = {
   user: null
 };
 
-const verifyToken = (serviceToken) => {
-  if (!serviceToken) {
-    return false;
+const verifyToken = async () => {
+  try {
+    const response = await axios.get('/auth/verify');
+
+    // Handle success
+    console.log('Token verification successful');
+    console.log('User data:', response.data); // Assuming the server sends user data in the response
+
+    // You can perform additional actions here based on a successful token verification
+    return response;
+  } catch (error) {
+    // Handle errors
+    if (axios.isAxiosError(error)) {
+      // Axios error, which means there was an HTTP response with a status code outside the range of 2xx
+      if (error.response) {
+        // The request was made, but the server responded with a status code that falls out of the range of 2xx
+        console.error('Request failed with status code:', error.response.status);
+        console.error('Error data:', error.response.data);
+
+        // You can perform specific actions based on different status codes or error response data
+
+      } else if (error.request) {
+        // The request was made, but no response was received
+        console.error('No response received from the server');
+
+        // You can perform specific actions for requests that didn't receive a response
+
+      } else {
+        // Something went wrong while setting up the request or processing the response
+        console.error('Error setting up the request or processing the response:', error.message);
+      }
+    } else {
+      // Non-Axios error, such as a network error or a timeout
+      console.error('Non-Axios error:', error.message);
+    }
+
+    // You can perform additional actions here based on the type of error
+
   }
-  const decoded = jwtDecode(serviceToken);
-  /**
-   * Property 'exp' does not exist on type '<T = unknown>(token: string, options?: JwtDecodeOptions | undefined) => T'.
-   */
-  return decoded.exp > Date.now() / 1000;
 };
+
 
 const setSession = (serviceToken) => {
   if (serviceToken) {
@@ -49,27 +81,48 @@ const JWTContext = createContext(null);
 
 export const JWTProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  console.log("==> root auth", state);
 
   useEffect(() => {
     const init = async () => {
       try {
-        const serviceToken = window.localStorage.getItem('serviceToken');
-        if (serviceToken && verifyToken(serviceToken)) {
-          setSession(serviceToken);
-          const response = await axios.get('/api/account/me');
-          const { user } = response.data;
+        const response = await verifyToken();
+        const { data } = response;
+        console.log("===> response", response);
+
+
+        if (data) {
           dispatch({
             type: LOGIN,
             payload: {
-              isLoggedIn: true,
-              user
+              user: data
             }
           });
         } else {
+          console.log("===> else", user)
           dispatch({
             type: LOGOUT
           });
         }
+
+        // const serviceToken = window.localStorage.getItem('serviceToken');
+
+        // if (serviceToken && verifyToken(serviceToken)) {
+        //   setSession(serviceToken);
+        //   const response = await axios.get('/api/account/me');
+        //   const { user } = response.data;
+        //   dispatch({
+        //     type: LOGIN,
+        //     payload: {
+        //       isLoggedIn: true,
+        //       user
+        //     }
+        //   });
+        // } else {
+        //   dispatch({
+        //     type: LOGOUT
+        //   });
+        // }
       } catch (err) {
         console.error(err);
         dispatch({
@@ -81,10 +134,15 @@ export const JWTProvider = ({ children }) => {
     init();
   }, []);
 
-  const login = async (email, password) => {
-    const response = await axios.post('/api/account/login', { email, password });
-    const { serviceToken, user } = response.data;
-    setSession(serviceToken);
+  const login = async (office_id, password) => {
+    console.log("===> here", office_id, password, process.env.REACT_APP_API_URL);
+    // const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/signin`, { office_id, password });
+    const response = await axios.post(`/auth/signin`, { office_id, password });
+    console.log("===> res", response);
+    // const { serviceToken, user } = response.data;
+    const user = response.data;
+    console.log("===> user", user);
+    // setSession(serviceToken);
     dispatch({
       type: LOGIN,
       payload: {
@@ -92,6 +150,8 @@ export const JWTProvider = ({ children }) => {
         user
       }
     });
+
+    const authenticationCookieValue = Cookies.get('Authentication');
   };
 
   const register = async (email, password, firstName, lastName) => {
@@ -122,14 +182,14 @@ export const JWTProvider = ({ children }) => {
     window.localStorage.setItem('users', JSON.stringify(users));
   };
 
-  const logout = () => {
-    setSession(null);
+  const logout = async () => {
+    await axios.post(`/auth/logout`);
     dispatch({ type: LOGOUT });
   };
 
-  const resetPassword = async () => {};
+  const resetPassword = async () => { };
 
-  const updateProfile = () => {};
+  const updateProfile = () => { };
 
   if (state.isInitialized !== undefined && !state.isInitialized) {
     return <Loader />;
