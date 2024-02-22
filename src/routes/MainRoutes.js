@@ -10,6 +10,10 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
 const DashboardAnalytics = Loadable(lazy(() => import('pages/dashboard/analytics')));
 
+// render - sample
+const SampleList = Loadable(lazy(() => import('pages/sample/sample-list')));
+// const DashboardAnalytics = Loadable(lazy(() => import('pages/dashboard/analytics')));
+
 // render - widget
 const WidgetStatistics = Loadable(lazy(() => import('pages/widget/statistics')));
 const WidgetData = Loadable(lazy(() => import('pages/widget/data')));
@@ -99,7 +103,7 @@ const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/comi
 const AppContactUS = Loadable(lazy(() => import('pages/contact-us')));
 
 // render - sample page
-const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
+// const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
 const PricingPage = Loadable(lazy(() => import('pages/extra-pages/pricing')));
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -125,6 +129,15 @@ const MainRoutes = {
             {
               path: 'analytics',
               element: <DashboardAnalytics />
+            }
+          ]
+        },
+        {
+          path: 'samples',
+          children: [
+            {
+              path: 'sample-list',
+              element: <SampleList />
             }
           ]
         },
@@ -416,10 +429,10 @@ const MainRoutes = {
             }
           ]
         },
-        {
-          path: 'sample-page',
-          element: <SamplePage />
-        },
+        // {
+        //   path: 'sample-page',
+        //   element: <SamplePage />
+        // },
         {
           path: 'pricing',
           element: <PricingPage />
@@ -478,16 +491,16 @@ const MainRoutes = {
         }
       ]
     },
-    {
-      path: '/',
-      element: <CommonLayout layout="simple" />,
-      children: [
-        {
-          path: 'contact-us',
-          element: <AppContactUS />
-        }
-      ]
-    }
+    // {
+    //   path: '/',
+    //   element: <CommonLayout layout="simple" />,
+    //   children: [
+    //     {
+    //       path: 'contact-us',
+    //       element: <AppContactUS />
+    //     }
+    //   ]
+    // }
   ]
 };
 

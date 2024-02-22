@@ -16,7 +16,7 @@ import MainRoutes from './MainRoutes';
 export default function ThemeRoutes() {
   return useRoutes([
     LoginRoutes,
+    MainRoutes,
     ComponentsRoutes,
-    MainRoutes
   ]);
 }
